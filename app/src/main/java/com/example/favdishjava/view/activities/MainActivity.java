@@ -1,8 +1,10 @@
-package com.example.favdishjava;
+package com.example.favdishjava.view.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.favdishjava.R;
 
 public class MainActivity extends AppCompatActivity {
 
