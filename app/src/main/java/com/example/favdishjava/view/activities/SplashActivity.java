@@ -49,7 +49,7 @@ public class SplashActivity extends AppCompatActivity {
                     public void run() {
                         //Do something after delay
                         finish();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
                     }
                 }, 1000);
             }
