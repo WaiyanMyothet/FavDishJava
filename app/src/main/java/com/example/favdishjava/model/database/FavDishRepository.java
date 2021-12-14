@@ -18,13 +18,17 @@ public class FavDishRepository {
         return _favDishDao.insertFavDishDetails(favDish);
     }
 
-    public Flowable<List<FavDish>> allDishesList = _favDishDao.getAllDishesList();
+    public Flowable<List<FavDish>> allDishesList (){
+        return _favDishDao.getAllDishesList();
+    }
 
     public Completable updateFavDishData(FavDish favDish) {
         return _favDishDao.updateFavDishDetails(favDish);
     }
 
-    public Flowable<List<FavDish>> favoriteDishes = _favDishDao.getFavoriteDishesList();
+    public Flowable<List<FavDish>> favoriteDishes(){
+        return _favDishDao.getFavoriteDishesList();
+    }
 
     public Completable deleteFavDishData(FavDish favDish) {
         return _favDishDao.deleteFavDishDetails(favDish);
@@ -37,6 +41,5 @@ public class FavDishRepository {
     public Flowable<List<FavDish>> dishesList() {
         return _favDishDao.getDishesList();
     }
-
 
 }

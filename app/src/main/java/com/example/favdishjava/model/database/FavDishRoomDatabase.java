@@ -11,9 +11,7 @@ import com.example.favdishjava.model.entities.FavDish;
 
 @Database(entities = FavDish.class, version = 1, exportSchema = false)
 public abstract class FavDishRoomDatabase extends RoomDatabase {
-    public abstract FavDishDao favDishDao();
-
-    private static FavDishRoomDatabase Instance;
+    public static FavDishRoomDatabase Instance;
 
     public static synchronized FavDishRoomDatabase getDatabase(Context context) {
         if (Instance == null) {
@@ -26,6 +24,8 @@ public abstract class FavDishRoomDatabase extends RoomDatabase {
         }
         return Instance;
     }
+
+    public abstract FavDishDao favDishDao();
 
 
 }
