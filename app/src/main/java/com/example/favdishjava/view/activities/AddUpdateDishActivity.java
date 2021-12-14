@@ -186,6 +186,37 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
                 customItemsListDialog(getResources().getString(R.string.title_select_dish_cooking_time), Constants.dishCookTime(), Constants.DISH_COOKING_TIME);
                 return;
             case R.id.btn_add_dish:
+                String title=binding.etTitle.toString().trim();
+                String type=binding.etType.toString().trim();
+                String category=binding.etCategory.toString().trim();
+                String ingredients=binding.etIngredients.toString().trim();
+                String cookingInMinutes=binding.etCookingTime.toString().trim();
+                String cookingDirection=binding.etDirectionToCook.toString().trim();
+                if(mImagePath.isEmpty()){
+                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_image),Toast.LENGTH_SHORT).show();
+                }
+                else if(title.isEmpty()){
+                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_enter_dish_title),Toast.LENGTH_SHORT).show();
+                }
+                else if(type.isEmpty()){
+                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_type),Toast.LENGTH_SHORT).show();
+                }else if(category.isEmpty()){
+                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_category),Toast.LENGTH_SHORT).show();
+                }
+                else if(ingredients.isEmpty()){
+                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_enter_dish_ingredients),Toast.LENGTH_SHORT).show();
+                }
+                else if(cookingInMinutes.isEmpty()){
+                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_cooking_time),Toast.LENGTH_SHORT).show();
+                }
+                else if(cookingDirection.isEmpty()){
+                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_enter_dish_cooking_instructions),Toast.LENGTH_SHORT).show();
+                }
+                else{
+
+                }
+
+
                 return;
             default:
                 break;
