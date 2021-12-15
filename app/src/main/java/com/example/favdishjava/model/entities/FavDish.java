@@ -11,9 +11,91 @@ import androidx.room.PrimaryKey;
 public class FavDish implements Parcelable {
 
     public String image;
+
+    public String getImage() {
+        return image;
+    }
+
+    public String getImageSource() {
+        return imageSource;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public String getCookingTime() {
+        return cookingTime;
+    }
+
+    public String getDirectionToCook() {
+        return directionToCook;
+    }
+
+    public Boolean getFavoriteDish() {
+        return favoriteDish;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
     @ColumnInfo(name = "image_source")
     public String imageSource;
     public String title;
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public void setImageSource(String imageSource) {
+        this.imageSource = imageSource;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setCookingTime(String cookingTime) {
+        this.cookingTime = cookingTime;
+    }
+
+    public void setDirectionToCook(String directionToCook) {
+        this.directionToCook = directionToCook;
+    }
+
+    public void setFavoriteDish(Boolean favoriteDish) {
+        this.favoriteDish = favoriteDish;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String type;
     public String category;
     public String ingredients;
@@ -25,6 +107,10 @@ public class FavDish implements Parcelable {
     public Boolean favoriteDish = false;
     @PrimaryKey(autoGenerate = true)
     public Integer id = 0;
+
+    public  FavDish(){
+
+    }
 
     @Override
     public int describeContents() {

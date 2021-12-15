@@ -4,6 +4,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
@@ -35,13 +37,17 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.favdishjava.R;
+import com.example.favdishjava.application.FavDishApplication;
 import com.example.favdishjava.databinding.ActivityAddUpdateDishBinding;
 import com.example.favdishjava.databinding.ActivityMainBinding;
 import com.example.favdishjava.databinding.DialogCustomImageSelectionBinding;
 import com.example.favdishjava.databinding.DialogCustomListBinding;
+import com.example.favdishjava.model.database.FavDishRepository;
 import com.example.favdishjava.model.entities.FavDish;
 import com.example.favdishjava.utils.Constants;
 import com.example.favdishjava.view.adapters.CustomListItemAdapter;
+import com.example.favdishjava.viewmodel.FavDishViewModel;
+import com.example.favdishjava.viewmodel.FavDishViewModelFactory;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -68,12 +74,14 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
     private FavDish mFavDishDetails = null;
     private Dialog mCustomListDialog;
 
+    private FavDishViewModel mFavDishViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityAddUpdateDishBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        mFavDishViewModel = ViewModelProviders.of(this, new FavDishViewModelFactory(new FavDishApplication(getApplicationContext()).getRepository())).get(FavDishViewModel.class);
         binding.ivAddDishImage.setOnClickListener(this::onClick);
         binding.etType.setOnClickListener(this::onClick);
         binding.etCategory.setOnClickListener(this::onClick);
@@ -136,7 +144,6 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
                             .centerCrop()
                             .into(binding.ivDishImage);
                     mImagePath = saveImageToInternalStorage(thumbnail);
-                    Log.e("photo",mImagePath);
                     binding.ivAddDishImage.setImageDrawable(ContextCompat.getDrawable(AddUpdateDishActivity.this, R.drawable.ic_vector_edit));
                 }
             } else if (requestCode == GALLERY) {
@@ -186,34 +193,59 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
                 customItemsListDialog(getResources().getString(R.string.title_select_dish_cooking_time), Constants.dishCookTime(), Constants.DISH_COOKING_TIME);
                 return;
             case R.id.btn_add_dish:
-                String title=binding.etTitle.toString().trim();
-                String type=binding.etType.toString().trim();
-                String category=binding.etCategory.toString().trim();
-                String ingredients=binding.etIngredients.toString().trim();
-                String cookingInMinutes=binding.etCookingTime.toString().trim();
-                String cookingDirection=binding.etDirectionToCook.toString().trim();
-                if(mImagePath.isEmpty()){
-                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_image),Toast.LENGTH_SHORT).show();
-                }
-                else if(title.isEmpty()){
-                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_enter_dish_title),Toast.LENGTH_SHORT).show();
-                }
-                else if(type.isEmpty()){
-                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_type),Toast.LENGTH_SHORT).show();
-                }else if(category.isEmpty()){
-                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_category),Toast.LENGTH_SHORT).show();
-                }
-                else if(ingredients.isEmpty()){
-                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_enter_dish_ingredients),Toast.LENGTH_SHORT).show();
-                }
-                else if(cookingInMinutes.isEmpty()){
-                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_select_dish_cooking_time),Toast.LENGTH_SHORT).show();
-                }
-                else if(cookingDirection.isEmpty()){
-                    Toast.makeText(AddUpdateDishActivity.this,getResources().getString(R.string.err_msg_enter_dish_cooking_instructions),Toast.LENGTH_SHORT).show();
-                }
-                else{
-
+                String title = binding.etTitle.getText().toString().trim();
+                String type = binding.etType.getText().toString().trim();
+                String category = binding.etCategory.getText().toString().trim();
+                String ingredients = binding.etIngredients.getText().toString().trim();
+                String cookingInMinutes = binding.etCookingTime.getText().toString().trim();
+                String cookingDirection = binding.etDirectionToCook.getText().toString().trim();
+                if (mImagePath.isEmpty()) {
+                    Toast.makeText(AddUpdateDishActivity.this, getResources().getString(R.string.err_msg_select_dish_image), Toast.LENGTH_SHORT).show();
+                } else if (title.isEmpty()) {
+                    Toast.makeText(AddUpdateDishActivity.this, getResources().getString(R.string.err_msg_enter_dish_title), Toast.LENGTH_SHORT).show();
+                } else if (type.isEmpty()) {
+                    Toast.makeText(AddUpdateDishActivity.this, getResources().getString(R.string.err_msg_select_dish_type), Toast.LENGTH_SHORT).show();
+                } else if (category.isEmpty()) {
+                    Toast.makeText(AddUpdateDishActivity.this, getResources().getString(R.string.err_msg_select_dish_category), Toast.LENGTH_SHORT).show();
+                } else if (ingredients.isEmpty()) {
+                    Toast.makeText(AddUpdateDishActivity.this, getResources().getString(R.string.err_msg_enter_dish_ingredients), Toast.LENGTH_SHORT).show();
+                } else if (cookingInMinutes.isEmpty()) {
+                    Toast.makeText(AddUpdateDishActivity.this, getResources().getString(R.string.err_msg_select_dish_cooking_time), Toast.LENGTH_SHORT).show();
+                } else if (cookingDirection.isEmpty()) {
+                    Toast.makeText(AddUpdateDishActivity.this, getResources().getString(R.string.err_msg_enter_dish_cooking_instructions), Toast.LENGTH_SHORT).show();
+                } else {
+                    Integer dishID = 0;
+                    String imageSource = Constants.DISH_IMAGE_SOURCE_LOCAL;
+                    Boolean favoriteDish = false;
+                    if (mFavDishDetails != null) {
+                        dishID = mFavDishDetails.id;
+                        imageSource = mFavDishDetails.imageSource;
+                        favoriteDish = mFavDishDetails.favoriteDish;
+                    }
+                    FavDish favDish = new FavDish();
+                    favDish.setId(dishID);
+                    favDish.setCategory(category);
+                    favDish.setCookingTime(cookingInMinutes);
+                    favDish.setDirectionToCook(cookingDirection);
+                    favDish.setFavoriteDish(favoriteDish);
+                    favDish.setImage(mImagePath);
+                    favDish.setImageSource(imageSource);
+                    favDish.setIngredients(ingredients);
+                    favDish.setTitle(title);
+                    favDish.setType(type);
+                    if (dishID == 0) {
+                        mFavDishViewModel.insert(favDish);
+                        Toast.makeText(AddUpdateDishActivity.this,
+                                "You successfully added your favorite dish details.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        mFavDishViewModel.update(favDish);
+                        Toast.makeText(AddUpdateDishActivity.this,
+                                "You successfully updated your favorite dish details.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
                 }
 
 
