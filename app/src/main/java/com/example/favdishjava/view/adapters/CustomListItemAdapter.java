@@ -1,6 +1,7 @@
 package com.example.favdishjava.view.adapters;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,7 @@ public class CustomListItemAdapter extends RecyclerView.Adapter<CustomListItemAd
                    ((AddUpdateDishActivity) activity).selectedListItem(item,selection);
                }
                if(fragment instanceof AllDishesFragment){
-
+                   ((AllDishesFragment) fragment).filterSelection(item);
                }
            }
        });
