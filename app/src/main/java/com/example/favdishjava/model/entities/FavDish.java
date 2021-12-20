@@ -106,7 +106,7 @@ public class FavDish implements Parcelable {
     @ColumnInfo(name = "favorite_dish")
     public Boolean favoriteDish = false;
     @PrimaryKey(autoGenerate = true)
-    public Integer id = 0;
+    public Integer id;
 
     public  FavDish(){
 

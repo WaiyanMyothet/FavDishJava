@@ -1,11 +1,14 @@
 package com.example.favdishjava.model.database;
 
+import androidx.annotation.WorkerThread;
+
 import com.example.favdishjava.model.entities.FavDish;
 
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 
 public class FavDishRepository {
     private FavDishDao _favDishDao;
@@ -15,7 +18,7 @@ public class FavDishRepository {
     }
 
     public Completable insertFavDishData(FavDish favDish) {
-        return _favDishDao.insertFavDishDetails(favDish);
+        return  _favDishDao.insertFavDishDetails(favDish);
     }
 
     public Flowable<List<FavDish>> allDishesList (){

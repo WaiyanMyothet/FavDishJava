@@ -10,7 +10,7 @@ import androidx.room.RoomDatabase;
 import com.example.favdishjava.model.entities.FavDish;
 
 
-@Database(entities = FavDish.class, version = 1, exportSchema = false)
+@Database(entities = FavDish.class, version = 1)
 public abstract class FavDishRoomDatabase extends RoomDatabase {
     public static FavDishRoomDatabase Instance;
 

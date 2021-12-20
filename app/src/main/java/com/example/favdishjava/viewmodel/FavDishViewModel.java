@@ -8,6 +8,7 @@ import com.example.favdishjava.model.entities.FavDish;
 
 import java.util.List;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class FavDishViewModel extends ViewModel {
@@ -17,8 +18,8 @@ public class FavDishViewModel extends ViewModel {
         _repository = repository;
     }
 
-    public void insert(FavDish favDish) {
-        _repository.insertFavDishData(favDish);
+    public Completable insert(FavDish favDish) {
+       return  _repository.insertFavDishData(favDish);
     }
 
     public LiveData<List<FavDish>> allDishesList() {
@@ -26,8 +27,8 @@ public class FavDishViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io()));
     }
 
-    public void update(FavDish favDish) {
-        _repository.updateFavDishData(favDish);
+    public Completable update(FavDish favDish) {
+       return  _repository.updateFavDishData(favDish);
     }
 
     public LiveData<List<FavDish>> favoriteDishes() {

@@ -63,6 +63,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class AddUpdateDishActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final int CAMERA = 1;
@@ -75,6 +79,7 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
     private Dialog mCustomListDialog;
 
     private FavDishViewModel mFavDishViewModel;
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,13 +222,14 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
                     Integer dishID = 0;
                     String imageSource = Constants.DISH_IMAGE_SOURCE_LOCAL;
                     Boolean favoriteDish = false;
+                    FavDish favDish = new FavDish();
                     if (mFavDishDetails != null) {
                         dishID = mFavDishDetails.id;
+                        favDish.setId(dishID);
                         imageSource = mFavDishDetails.imageSource;
                         favoriteDish = mFavDishDetails.favoriteDish;
                     }
-                    FavDish favDish = new FavDish();
-                    favDish.setId(dishID);
+
                     favDish.setCategory(category);
                     favDish.setCookingTime(cookingInMinutes);
                     favDish.setDirectionToCook(cookingDirection);
@@ -234,21 +240,19 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
                     favDish.setTitle(title);
                     favDish.setType(type);
                     if (dishID == 0) {
-                        mFavDishViewModel.insert(favDish);
-                        Toast.makeText(AddUpdateDishActivity.this,
-                                "You successfully added your favorite dish details.",
-                                Toast.LENGTH_SHORT).show();
+                        mDisposable.add(mFavDishViewModel.insert(favDish)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> InsertSuccess(),
+                                        throwable -> Log.e("Error", "Unable to insert data")));
+                    } else {
+                        mDisposable.add(mFavDishViewModel.update(favDish)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> UpdateSuccess(),
+                                        throwable -> Log.e("Error", "Unable to update data")));
                     }
-                    else{
-                        mFavDishViewModel.update(favDish);
-                        Toast.makeText(AddUpdateDishActivity.this,
-                                "You successfully updated your favorite dish details.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                    finish();
                 }
-
-
                 return;
             default:
                 break;
@@ -376,7 +380,21 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
                 e.printStackTrace();
             }
         }
-        return directory.getAbsolutePath();
+        return mypath.getAbsolutePath();
+    }
+
+    private void InsertSuccess() {
+        Toast.makeText(AddUpdateDishActivity.this,
+                "You successfully added your favorite dish details.",
+                Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    private void UpdateSuccess() {
+        Toast.makeText(AddUpdateDishActivity.this,
+                "You successfully added your favorite dish details.",
+                Toast.LENGTH_SHORT).show();
+        finish();
     }
 
 }
