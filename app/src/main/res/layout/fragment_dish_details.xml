@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_dish_detail_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
     tools:context=".view.fragments.DishDetailsFragment">
 
     <RelativeLayout
@@ -127,5 +130,4 @@
             android:textColor="@color/grey_500"
             tools:text="@string/lbl_estimate_cooking_time" />
     </RelativeLayout>
-
-</FrameLayout>
+</ScrollView>

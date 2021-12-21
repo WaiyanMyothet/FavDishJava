@@ -1,9 +1,13 @@
 package com.example.favdishjava.view.fragments;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,9 +15,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,11 +45,21 @@ import com.example.favdishjava.viewmodel.FavDishViewModelFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
+import static androidx.navigation.fragment.NavHostFragment.findNavController;
+
 public class AllDishesFragment extends Fragment {
 
     private FavDishViewModel mFavDishViewModel;
     private Dialog mCustomListDialog;
     private FragmentAllDishesBinding binding;
+    private FavDishAdapter adapter;
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +67,17 @@ public class AllDishesFragment extends Fragment {
         mFavDishViewModel = ViewModelProviders.of(this, new FavDishViewModelFactory(new FavDishApplication(getActivity().getApplicationContext()).getRepository())).get(FavDishViewModel.class);
 
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (requireActivity() instanceof MainActivity) {
+            MainActivity activity = (MainActivity) getActivity();
+            if (activity != null)
+                activity.showBottomNavigationView();
+        }
+
     }
 
     @Override
@@ -63,21 +90,17 @@ public class AllDishesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.rvDishesList.setLayoutManager(new GridLayoutManager(getActivity(),2));
-        FavDishAdapter adapter=new FavDishAdapter(this);
+        adapter = new FavDishAdapter(this);
+        binding.rvDishesList.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         binding.rvDishesList.setAdapter(adapter);
         mFavDishViewModel.allDishesList().observe(getViewLifecycleOwner(), new Observer<List<FavDish>>() {
             @Override
             public void onChanged(List<FavDish> favDishes) {
-                Log.e("onchanged", String.valueOf(favDishes.size()));
-                if(!favDishes.isEmpty()){
-                    Log.e("onchanged", "if");
+                if (!favDishes.isEmpty()) {
                     binding.rvDishesList.setVisibility(View.VISIBLE);
                     binding.tvNoDishesAddedYet.setVisibility(View.GONE);
                     adapter.dishesList(favDishes);
-                }
-                else{
-                    Log.e("onchanged", "else");
+                } else {
                     binding.rvDishesList.setVisibility(View.GONE);
                     binding.tvNoDishesAddedYet.setVisibility(View.VISIBLE);
                 }
@@ -119,8 +142,73 @@ public class AllDishesFragment extends Fragment {
         mCustomListDialog.show();
     }
 
-    public void filterSelection(String item) {
+    public void filterSelection(String filterItemSelection) {
         mCustomListDialog.dismiss();
+        if (filterItemSelection == Constants.ALL_ITEMS) {
+            mFavDishViewModel.allDishesList().observe(getViewLifecycleOwner(), new Observer<List<FavDish>>() {
+                @Override
+                public void onChanged(List<FavDish> favDishes) {
+                    if (!favDishes.isEmpty()) {
+                        binding.rvDishesList.setVisibility(View.VISIBLE);
+                        binding.tvNoDishesAddedYet.setVisibility(View.GONE);
+                        adapter.dishesList(favDishes);
+                    } else {
+                        binding.rvDishesList.setVisibility(View.GONE);
+                        binding.tvNoDishesAddedYet.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        } else {
+            mFavDishViewModel.getFilteredList(filterItemSelection).observe(getViewLifecycleOwner(), new Observer<List<FavDish>>() {
+                @Override
+                public void onChanged(List<FavDish> favDishes) {
+                    if (!favDishes.isEmpty()) {
+                        binding.rvDishesList.setVisibility(View.VISIBLE);
+                        binding.tvNoDishesAddedYet.setVisibility(View.GONE);
+                        adapter.dishesList(favDishes);
+                    } else {
+                        binding.rvDishesList.setVisibility(View.GONE);
+                        binding.tvNoDishesAddedYet.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
 
+        }
+
+    }
+
+    public void deleteDish(FavDish dish) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setTitle(getResources().getString(R.string.title_delete_dish));
+        builder.setMessage(getResources().getString(R.string.msg_delete_dish_dialog, dish.title));
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.setPositiveButton(getResources().getString(R.string.lbl_yes), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mDisposable.add(mFavDishViewModel.delete(dish)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> dialog.dismiss(),
+                                throwable -> Log.e("Error", "Unable to delete data")));
+
+            }
+        });
+        builder.setNegativeButton(getResources().getString(R.string.lbl_no), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        builder.show();
+    }
+
+    public void dishDetails(FavDish favDish) {
+        if (requireActivity() instanceof MainActivity) {
+            MainActivity activity = (MainActivity) getActivity();
+            if (activity != null)
+                activity.hideBottomNavigationView();
+        }
+        NavHostFragment.findNavController(this).navigate(AllDishesFragmentDirections.actionAllDishesToDishDetails(favDish));
     }
 }

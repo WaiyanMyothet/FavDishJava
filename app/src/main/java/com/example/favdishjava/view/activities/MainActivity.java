@@ -7,6 +7,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.favdishjava.R;
 import com.example.favdishjava.databinding.ActivityMainBinding;
@@ -29,13 +30,25 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         mNavController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this,mNavController,mAppBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView,mNavController);
+        NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(binding.navView, mNavController);
 
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        return NavigationUI.navigateUp(mNavController,mAppBarConfiguration);
+        return NavigationUI.navigateUp(mNavController, mAppBarConfiguration);
+    }
+
+    public void hideBottomNavigationView() {
+        binding.navView.clearAnimation();
+        binding.navView.animate().translationY(binding.navView.getHeight()).setDuration(300);
+        binding.navView.setVisibility(View.GONE);
+    }
+
+    public void showBottomNavigationView() {
+        binding.navView.clearAnimation();
+        binding.navView.animate().translationY(0F).setDuration(300);
+        binding.navView.setVisibility(View.VISIBLE);
     }
 }

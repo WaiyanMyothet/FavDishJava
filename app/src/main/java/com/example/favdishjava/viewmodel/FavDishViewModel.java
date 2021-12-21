@@ -36,8 +36,8 @@ public class FavDishViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io()));
     }
 
-    public void delete(FavDish favDish) {
-        _repository.deleteFavDishData(favDish);
+    public Completable delete(FavDish favDish) {
+       return  _repository.deleteFavDishData(favDish);
     }
 
     public LiveData<List<FavDish>> getFilteredList(String value) {

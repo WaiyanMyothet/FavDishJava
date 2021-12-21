@@ -62,6 +62,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -80,6 +81,8 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
 
     private FavDishViewModel mFavDishViewModel;
     private final CompositeDisposable mDisposable = new CompositeDisposable();
+
+    private  Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +116,7 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
             binding.etCookingTime.setText(mFavDishDetails.cookingTime);
             binding.etDirectionToCook.setText(mFavDishDetails.directionToCook);
             binding.btnAddDish.setText(getResources().getString(R.string.lbl_update_dish));
+            binding.ivAddDishImage.setImageDrawable(ContextCompat.getDrawable(AddUpdateDishActivity.this, R.drawable.ic_vector_edit));
         }
     }
 
@@ -139,6 +143,7 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        dialog.dismiss();
         if (resultCode == RESULT_OK) {
             if (requestCode == CAMERA) {
                 if (data != null) {
@@ -174,7 +179,6 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
                             .into(binding.ivDishImage);
                     binding.ivAddDishImage.setImageDrawable(ContextCompat.getDrawable(AddUpdateDishActivity.this, R.drawable.ic_vector_edit));
                 }
-
             }
 
         } else if (resultCode == RESULT_CANCELED) {
@@ -260,7 +264,7 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
     }
 
     private void customImageSelectionDialog() {
-        Dialog dialog = new Dialog(this);
+        dialog = new Dialog(this);
         DialogCustomImageSelectionBinding imgBinding = DialogCustomImageSelectionBinding.inflate(getLayoutInflater());
         dialog.setContentView(imgBinding.getRoot());
         imgBinding.tvCamera.setOnClickListener(new View.OnClickListener() {
@@ -363,7 +367,8 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
         File directory = cw.getDir(IMAGE_DIRECTORY, Context.MODE_PRIVATE);
-        File mypath = new File(directory, "${UUID.randomUUID()}.jpg");
+        UUID uuid=UUID.randomUUID();
+        File mypath = new File(directory, uuid+".jpg");
 
         FileOutputStream stream = null;
         try {
