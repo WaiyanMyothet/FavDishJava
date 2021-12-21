@@ -60,6 +60,7 @@ public class FavDishAdapter extends RecyclerView.Adapter<FavDishAdapter.ViewHold
                     ((AllDishesFragment) fragment).dishDetails(dish);
                 }
                 else if(fragment instanceof FavoriteDishesFragment){
+                    ((FavoriteDishesFragment) fragment).dishDetails(dish);
                 }
             }
         });
