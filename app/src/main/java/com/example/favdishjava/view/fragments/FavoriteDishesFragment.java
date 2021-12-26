@@ -87,7 +87,7 @@ public class FavoriteDishesFragment extends Fragment {
             if (activity != null)
                 activity.hideBottomNavigationView();
         }
-        NavHostFragment.findNavController(this).navigate(AllDishesFragmentDirections.actionAllDishesToDishDetails(favDish));
+        NavHostFragment.findNavController(this).navigate(FavoriteDishesFragmentDirections.actionFavoriteDishesToDishDetails(favDish));
     }
 
     @Override
