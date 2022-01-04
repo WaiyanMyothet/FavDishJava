@@ -89,7 +89,7 @@ public class AddUpdateDishActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         binding = ActivityAddUpdateDishBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        mFavDishViewModel = ViewModelProviders.of(this, new FavDishViewModelFactory(new FavDishApplication(getApplicationContext()).getRepository())).get(FavDishViewModel.class);
+        mFavDishViewModel = ViewModelProviders.of(this, new FavDishViewModelFactory(new FavDishApplication().getRepository())).get(FavDishViewModel.class);
         binding.ivAddDishImage.setOnClickListener(this::onClick);
         binding.etType.setOnClickListener(this::onClick);
         binding.etCategory.setOnClickListener(this::onClick);

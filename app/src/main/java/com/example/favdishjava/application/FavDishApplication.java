@@ -9,17 +9,15 @@ import com.example.favdishjava.model.database.FavDishRoomDatabase;
 import com.example.favdishjava.utils.Constants;
 
 public class FavDishApplication extends Application {
+    private static FavDishRoomDatabase database;
 
-    private FavDishRoomDatabase database;
-    private FavDishRepository repository;
-    private Context context;
-
-    public FavDishApplication(Context context) {
-        this.context=context;
-        database = FavDishRoomDatabase.getDatabase(context);
-        repository = new FavDishRepository(database.favDishDao());
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        database = FavDishRoomDatabase.getDatabase(this);
     }
-    public FavDishRepository getRepository(){
-        return  repository;
+
+    public FavDishRepository getRepository() {
+        return new FavDishRepository(database.favDishDao());
     }
 }

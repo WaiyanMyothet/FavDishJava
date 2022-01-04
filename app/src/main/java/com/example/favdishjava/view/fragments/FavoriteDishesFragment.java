@@ -35,7 +35,7 @@ public class FavoriteDishesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFavDishViewModel = ViewModelProviders.of(this, new FavDishViewModelFactory(new FavDishApplication(getActivity().getApplicationContext()).getRepository())).get(FavDishViewModel.class);
+        mFavDishViewModel = ViewModelProviders.of(this, new FavDishViewModelFactory(new FavDishApplication().getRepository())).get(FavDishViewModel.class);
 
     }
 
